@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<dimen name="spacing_normal">8dp</dimen>
+	<dimen name="tag_dot_size">12dp</dimen>
+
+	<attr name="checkableChipViewStyle" format="reference"/>
+
+	<declare-styleable name="CheckableChipView">
+		<attr name="android:checked"/>
+		<attr name="android:text"/>
+		<attr name="android:textColor"/>
+		<attr name="android:textSize"/>
+		<attr name="android:color"/>
+		<attr name="android:padding"/>
+		<attr name="android:strokeColor"/>
+		<attr name="outlineWidth" format="dimension"/>
+		<attr name="clearIcon" format="reference"/>
+		<attr name="foreground" format="reference"/>
+		<attr name="showIcons" format="boolean"/>
+	</declare-styleable>
+
+	<style name="Widget.ChipView" parent="">
+		<item name="android:padding">@dimen/spacing_normal</item>
+		<item name="android:strokeColor">?android:textColorTertiary</item>
+		<item name="android:textColor">?android:textColorPrimary</item>
+		<item name="android:textSize">14sp</item>
+		<item name="outlineWidth">1dp</item>
+		<item name="clearIcon">@drawable/tag_clear</item>
+		<item name="foreground">?android:selectableItemBackground</item>
+		<item name="showIcons">true</item>
+	</style>
+</resources>

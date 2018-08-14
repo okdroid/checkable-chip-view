@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+	compileSdkVersion rootProject.compileSdkVersion
+
+	defaultConfig {
+		minSdkVersion rootProject.minSdkVersion
+		targetSdkVersion rootProject.targetSdkVersion
+
+		applicationId "com.waffleware.chipview.demo"
+		versionCode 1
+		versionName "1.0"
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+
+}
+
+dependencies {
+	implementation project(":lib")
+
+	implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
+
+	implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+	implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
+}
+
+repositories {
+	mavenCentral()
+}
