@@ -11,7 +11,7 @@ publishing {
 
 			pom.withXml {
 				def dependencies = asNode().appendNode('dependencies')
-				configurations.getByName("_releaseCompile").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+				configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
 					def dependency = dependencies.appendNode('dependency')
 					dependency.appendNode('groupId', it.moduleGroup)
 					dependency.appendNode('artifactId', it.moduleName)
@@ -29,8 +29,8 @@ bintray {
 	override = false
 	publish = true
 	pkg {
-		repo = 'checkable-chip-view'
-		name = project.name
+		repo = 'maven'
+		name = 'checkablechipview'
 		userOrg = 'markushi'
 		licenses = ['Apache-2.0']
 		desc = 'Checkable Chipview for Android'
@@ -41,4 +41,5 @@ bintray {
 			vcsTag = '0.0.9'
 		}
 	}
+	publications = ['Production']
 }

@@ -21,8 +21,6 @@ android:
     - addon-google_apis-google-28
     - extra-google-m2repository
     - extra-android-m2repository
-script:
-  - ./gradlew :lib:test
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -30,4 +28,12 @@ cache:
     - $HOME/.m2
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-
+script:
+ - ./gradlew clean :lib:assembleRelease :lib:test
+deploy:
+  provider: script
+  script: ./gradlew :lib:assembleRelease :lib:bintrayUpload
+  skip_cleanup: true
+  dry-run: false
+  on:
+    branch: master
