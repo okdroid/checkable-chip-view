@@ -1,0 +1,44 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+publishing {
+	publications {
+		Production(MavenPublication) {
+			artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+			groupId 'com.github.okdroid'
+			artifactId 'checkablechipview'
+			version '0.0.9'
+
+			pom.withXml {
+				def dependencies = asNode().appendNode('dependencies')
+				configurations.getByName("_releaseCompile").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+					def dependency = dependencies.appendNode('dependency')
+					dependency.appendNode('groupId', it.moduleGroup)
+					dependency.appendNode('artifactId', it.moduleName)
+					dependency.appendNode('version', it.moduleVersion)
+				}
+			}
+		}
+	}
+}
+
+bintray {
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_API_KEY')
+	dryRun = false
+	override = false
+	publish = true
+	pkg {
+		repo = 'checkable-chip-view'
+		name = project.name
+		userOrg = 'markushi'
+		licenses = ['Apache-2.0']
+		desc = 'Checkable Chipview for Android'
+		vcsUrl = 'https://github.com/okdroid/checkable-chip-view.git'
+
+		version {
+			name = '0.0.9'
+			vcsTag = '0.0.9'
+		}
+	}
+}

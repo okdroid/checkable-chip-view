@@ -17,6 +17,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply from: 'publish.gradle'
 
 android {
 	compileSdkVersion rootProject.compileSdkVersion
@@ -24,9 +25,6 @@ android {
 	defaultConfig {
 		minSdkVersion rootProject.minSdkVersion
 		targetSdkVersion rootProject.targetSdkVersion
-
-		versionCode 1
-		versionName "1.0"
 	}
 
 	buildTypes {

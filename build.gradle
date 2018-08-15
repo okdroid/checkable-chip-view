@@ -26,6 +26,8 @@ buildscript {
 
 		kotlinVersion = '1.2.60'
 		ktxVersion = "1.0.0-rc01"
+
+		bintrayGradlePluginVersion = '1.8.4'
 	}
 
 	repositories {
@@ -37,6 +39,7 @@ buildscript {
 	dependencies {
 		classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+		classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintrayGradlePluginVersion"
 	}
 }
 
