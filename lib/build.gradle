@@ -21,6 +21,7 @@ apply from: 'publish.gradle'
 
 android {
 	compileSdkVersion rootProject.compileSdkVersion
+	buildToolsVersion rootProject.buildToolsVersion
 
 	defaultConfig {
 		minSdkVersion rootProject.minSdkVersion
