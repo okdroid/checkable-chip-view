@@ -26,6 +26,8 @@ import android.graphics.Paint.Style.STROKE
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
+import android.support.annotation.ColorInt
+import android.support.v4.graphics.ColorUtils
 import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -34,13 +36,11 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
 import android.widget.Checkable
-import androidx.annotation.ColorInt
 import androidx.core.animation.doOnEnd
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getDimensionOrThrow
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.content.res.getDrawableOrThrow
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 

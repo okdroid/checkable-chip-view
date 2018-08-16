@@ -34,6 +34,6 @@ dependencies {
 	implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
 
-	implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-	implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
+	implementation "com.android.support:appcompat-v7:$rootProject.appcompatVersion"
+	implementation "com.android.support.constraint:constraint-layout:1.1.2"
 }
