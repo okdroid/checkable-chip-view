@@ -1,5 +1,5 @@
 # CheckableChipView
-[![Travis (.org)](https://img.shields.io/travis/markushi/checkable-chip-view.svg?style=for-the-badge)](https://travis-ci.org/okdroid/checkable-chip-view) [![Bintray](https://img.shields.io/bintray/v/markushi/maven/checkablechipview.svg?style=popout-square)](https://bintray.com/markushi/maven/checkablechipview)
+[![Travis (.org)](https://img.shields.io/travis/markushi/checkable-chip-view.svg?style=for-the-badge)](https://travis-ci.org/okdroid/checkable-chip-view) [![Bintray](https://img.shields.io/bintray/v/markushi/maven/checkablechipview.svg?style=for-the-badge)](https://bintray.com/markushi/maven/checkablechipview)
 
 
 ## Setup
