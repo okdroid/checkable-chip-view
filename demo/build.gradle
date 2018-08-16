@@ -29,19 +29,11 @@ android {
 }
 
 dependencies {
-	// implementation project(":lib")
-	implementation 'com.github.okdroid:checkablechipview:0.0.9'
+	implementation project(":lib")
 
 	implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
 
 	implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
 	implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
-}
-
-repositories {
-	mavenCentral()
-	maven {
-		url "https://dl.bintray.com/markushi/maven"
-	}
 }

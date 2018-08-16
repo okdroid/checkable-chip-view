@@ -1,15 +1,17 @@
 # CheckableChipView
-[![Build Status](https://travis-ci.org/okdroid/checkable-chip-view.svg?branch=master)](https://travis-ci.org/okdroid/checkable-chip-view)
+![Travis (.org)](https://img.shields.io/travis/okdroid/checkable-chip-view/master.svg?style=for-the-badge) ![Bintray](https://img.shields.io/bintray/v/markushi/maven/checkablechipview.svg?style=for-the-badge)
+
 
 ## Setup
-Add the maven repo to your project level `build.gradle`  
+Make sure you have the jcenter repo in your project level `build.gradle`  
 ```gradle
 allprojects {
     repositories {
-	    maven { url "https://dl.bintray.com/markushi/maven" }
+	    jcenter()
     }
 }
 ```
+
 Add the dependency to your lib/app `build.gradle`  
 ```gradle
 dependencies {
