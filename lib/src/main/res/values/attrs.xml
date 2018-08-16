@@ -26,10 +26,15 @@
 		<attr name="android:text"/>
 		<attr name="android:textColor"/>
 		<attr name="android:textSize"/>
+		<attr name="checkedTextColor" format="color"/>
+
 		<attr name="android:color"/>
 		<attr name="android:padding"/>
 		<attr name="android:strokeColor"/>
+
+		<attr name="outlineColor" format="color"/>
 		<attr name="outlineWidth" format="dimension"/>
+
 		<attr name="clearIcon" format="reference"/>
 		<attr name="foreground" format="reference"/>
 		<attr name="showIcons" format="boolean"/>

@@ -11,9 +11,17 @@
 		android:id="@+id/chip"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:checked="false"
+		android:text="Hello World"
+		android:color="?attr/colorAccent"
+		android:textSize="16sp"
+		android:textColor="?android:attr/textColorPrimary"
+		app:checkedTextColor="?android:attr/textColorPrimaryInverse"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintLeft_toLeftOf="parent"
 		app:layout_constraintRight_toRightOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+		app:layout_constraintTop_toTopOf="parent"
+		app:outlineColor="?attr/colorAccent"
+		app:outlineWidth="2dp"/>
 
 </android.support.constraint.ConstraintLayout>

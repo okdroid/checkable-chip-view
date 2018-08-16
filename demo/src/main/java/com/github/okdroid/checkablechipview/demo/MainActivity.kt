@@ -13,10 +13,6 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         val chip = findViewById<CheckableChipView>(R.id.chip)
-        chip.text = "Tap me!"
-        chip.checkedTextColor = Color.WHITE
-        chip.checkedColor = Color.BLUE
-
         chip.setOnClickListener {
             chip.setCheckedAnimated(!chip.isChecked) {
                 Toast.makeText(this@MainActivity, "Checked: ${chip.isChecked}", Toast.LENGTH_SHORT).show()

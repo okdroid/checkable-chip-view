@@ -16,6 +16,7 @@
 
 package com.github.okdroid.checkablechipview
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -26,6 +27,7 @@ import android.graphics.Paint.Style.STROKE
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
+import android.support.annotation.CallSuper
 import android.support.annotation.ColorInt
 import android.support.v4.graphics.ColorUtils
 import android.text.Layout.Alignment.ALIGN_NORMAL
@@ -35,12 +37,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
+import android.view.animation.Interpolator
 import android.widget.Checkable
+import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.getColorOrThrow
-import androidx.core.content.res.getDimensionOrThrow
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.content.res.getDrawableOrThrow
+import androidx.core.content.res.*
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 
@@ -88,7 +89,13 @@ class CheckableChipView @JvmOverloads constructor(
     /**
      * Sets the text color to be used when the widget is checked.
      */
-    var checkedTextColor: Int? = null
+    var checkedTextColor: Int = Color.TRANSPARENT
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidateOnAnimation()
+            }
+        }
 
     /**
      * Sets the text to be displayed.
@@ -96,6 +103,17 @@ class CheckableChipView @JvmOverloads constructor(
     var text: CharSequence = ""
         set(value) {
             field = value
+            updateContentDescription()
+            requestLayout()
+        }
+
+    /**
+     * Sets the textSize to be displayed.
+     */
+    var textSize: Float = 0f
+        set(value) {
+            field = value
+            textPaint.textSize = value
             updateContentDescription()
             requestLayout()
         }
@@ -127,15 +145,14 @@ class CheckableChipView @JvmOverloads constructor(
 
     private val dotPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
-    private val clear: Drawable
+    private val clearDrawable: Drawable
 
-    private val touchFeedback: Drawable
+    private val touchFeedbackDrawable: Drawable
 
     private lateinit var textLayout: StaticLayout
 
-    private var progressAnimator: ValueAnimator? = null
-
-    private val checkAnimationInterpolator = AnimationUtils.loadInterpolator(context, android.R.interpolator.fast_out_slow_in)
+    private val progressAnimator: ValueAnimator by lazy { ObjectAnimator.ofFloat(0f, 1f) }
+    private val checkAnimationInterpolator: Interpolator by lazy { AnimationUtils.loadInterpolator(context, android.R.interpolator.fast_out_slow_in) }
 
     init {
         val a = context.obtainStyledAttributes(
@@ -145,22 +162,24 @@ class CheckableChipView @JvmOverloads constructor(
                 R.style.Widget_ChipView
         )
         outlinePaint.apply {
-            color = a.getColorOrThrow(R.styleable.CheckableChipView_android_strokeColor)
+            color = a.getColorOrThrow(R.styleable.CheckableChipView_outlineColor)
             strokeWidth = a.getDimensionOrThrow(R.styleable.CheckableChipView_outlineWidth)
             style = STROKE
         }
-        defaultTextColor = a.getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
-        textPaint.apply {
-            color = defaultTextColor
-            textSize = a.getDimensionOrThrow(R.styleable.CheckableChipView_android_textSize)
-        }
 
-        clear = a.getDrawableOrThrow(R.styleable.CheckableChipView_clearIcon).apply {
+        checkedColor = a.getColor(R.styleable.CheckableChipView_android_color, checkedColor)
+        checkedTextColor = a.getColor(R.styleable.CheckableChipView_checkedTextColor, Color.TRANSPARENT)
+        defaultTextColor = a.getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
+
+        text = a.getStringOrThrow(R.styleable.CheckableChipView_android_text)
+        textSize = a.getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
+
+        clearDrawable = a.getDrawableOrThrow(R.styleable.CheckableChipView_clearIcon).apply {
             setBounds(
                     -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
             )
         }
-        touchFeedback = a.getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
+        touchFeedbackDrawable = a.getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
             callback = this@CheckableChipView
         }
         padding = a.getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
@@ -173,7 +192,7 @@ class CheckableChipView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val nonTextWidth = (4 * padding) +
                 (2 * outlinePaint.strokeWidth).toInt() +
-                if (showIcons) clear.intrinsicWidth else 0
+                if (showIcons) clearDrawable.intrinsicWidth else 0
         val availableTextWidth = when (MeasureSpec.getMode(widthMeasureSpec)) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
             MeasureSpec.AT_MOST -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
@@ -189,12 +208,15 @@ class CheckableChipView @JvmOverloads constructor(
                 outline.setRoundRect(0, 0, w, h, h / 2f)
             }
         }
-        touchFeedback.setBounds(0, 0, w, h)
+        touchFeedbackDrawable.setBounds(0, 0, w, h)
     }
 
+    @CallSuper
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
         val strokeWidth = outlinePaint.strokeWidth
-        val iconRadius = clear.intrinsicWidth / 2f
+        val iconRadius = clearDrawable.intrinsicWidth / 2f
         val halfStroke = strokeWidth / 2f
         val rounding = (height - strokeWidth) / 2f
 
@@ -235,7 +257,7 @@ class CheckableChipView @JvmOverloads constructor(
         // Text
         val textX = if (showIcons) {
             lerp(
-                    strokeWidth + padding + clear.intrinsicWidth + padding,
+                    strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
                     strokeWidth + padding * 2f,
                     progress
             )
@@ -243,7 +265,7 @@ class CheckableChipView @JvmOverloads constructor(
             strokeWidth + padding * 2f
         }
         val selectedColor = checkedTextColor
-        textPaint.color = if (selectedColor != null && selectedColor != 0 && progress > 0) {
+        textPaint.color = if (selectedColor != 0 && progress > 0) {
             ColorUtils.blendARGB(defaultTextColor, selectedColor, progress)
         } else {
             defaultTextColor
@@ -262,13 +284,13 @@ class CheckableChipView @JvmOverloads constructor(
                     y = height / 2f
             ) {
                 canvas.withScale(progress, progress) {
-                    clear.draw(canvas)
+                    clearDrawable.draw(canvas)
                 }
             }
         }
 
         // Touch feedback
-        touchFeedback.draw(canvas)
+        touchFeedbackDrawable.draw(canvas)
     }
 
     /**
@@ -277,8 +299,14 @@ class CheckableChipView @JvmOverloads constructor(
     fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
         val newProgress = if (checked) 1f else 0f
         if (newProgress != progress) {
-            progressAnimator?.cancel()
-            progressAnimator = ValueAnimator.ofFloat(progress, newProgress).apply {
+            progressAnimator.cancel()
+            progressAnimator.removeAllUpdateListeners()
+
+            progressAnimator.setFloatValues(progress, newProgress)
+            progressAnimator.duration = if (checked) SELECTING_DURATION else DESELECTING_DURATION
+            progressAnimator.interpolator = checkAnimationInterpolator
+
+            progressAnimator.apply {
                 addUpdateListener {
                     progress = it.animatedValue as Float
                 }
@@ -286,8 +314,6 @@ class CheckableChipView @JvmOverloads constructor(
                     progress = newProgress
                     onEnd?.invoke()
                 }
-                interpolator = checkAnimationInterpolator
-                duration = if (checked) SELECTING_DURATION else DESELECTING_DURATION
                 start()
             }
         }
@@ -304,22 +330,22 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     override fun verifyDrawable(who: Drawable?): Boolean {
-        return super.verifyDrawable(who) || who == touchFeedback
+        return super.verifyDrawable(who) || who == touchFeedbackDrawable
     }
 
     override fun drawableStateChanged() {
         super.drawableStateChanged()
-        touchFeedback.state = drawableState
+        touchFeedbackDrawable.state = drawableState
     }
 
     override fun jumpDrawablesToCurrentState() {
         super.jumpDrawablesToCurrentState()
-        touchFeedback.jumpToCurrentState()
+        touchFeedbackDrawable.jumpToCurrentState()
     }
 
     override fun drawableHotspotChanged(x: Float, y: Float) {
         super.drawableHotspotChanged(x, y)
-        touchFeedback.setHotspot(x, y)
+        touchFeedbackDrawable.setHotspot(x, y)
     }
 
     private fun createLayout(textWidth: Int) {
