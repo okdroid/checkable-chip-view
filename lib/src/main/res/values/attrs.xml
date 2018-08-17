@@ -30,7 +30,6 @@
 
 		<attr name="android:color"/>
 		<attr name="android:padding"/>
-		<attr name="android:strokeColor"/>
 
 		<attr name="outlineColor" format="color"/>
 		<attr name="outlineWidth" format="dimension"/>
