@@ -112,6 +112,9 @@ class CheckableChipView @JvmOverloads constructor(
      */
     var textSize: Float = 0f
         set(value) {
+            if (value < 0f) {
+                IllegalArgumentException("textSize can't be negative")
+            }
             field = value
             textPaint.textSize = value
             updateContentDescription()
@@ -151,7 +154,7 @@ class CheckableChipView @JvmOverloads constructor(
 
     private lateinit var textLayout: StaticLayout
 
-    private val progressAnimator: ValueAnimator by lazy { ObjectAnimator.ofFloat(0f, 1f) }
+    private val progressAnimator: ValueAnimator by lazy { ObjectAnimator.ofFloat() }
     private val checkAnimationInterpolator: Interpolator by lazy { AnimationUtils.loadInterpolator(context, android.R.interpolator.fast_out_slow_in) }
 
     init {
