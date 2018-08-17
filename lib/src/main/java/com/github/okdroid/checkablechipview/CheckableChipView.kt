@@ -190,25 +190,43 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val nonTextWidth = (4 * padding) +
-                (2 * outlinePaint.strokeWidth).toInt() +
-                if (showIcons) clearDrawable.intrinsicWidth else 0
-        val availableTextWidth = when (MeasureSpec.getMode(widthMeasureSpec)) {
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+
+        // width
+        val nonTextWidth = (4 * padding) + (2 * outlinePaint.strokeWidth).toInt() + if (showIcons) clearDrawable.intrinsicWidth else 0
+        val availableTextWidth = when (widthMode) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
             MeasureSpec.AT_MOST -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
             MeasureSpec.UNSPECIFIED -> Int.MAX_VALUE
             else -> Int.MAX_VALUE
         }
         createLayout(availableTextWidth)
-        val w = nonTextWidth + textLayout.textWidth()
-        val h = padding + textLayout.height + padding
-        setMeasuredDimension(w, h)
+        val desiredWidth = nonTextWidth + textLayout.textWidth()
+        val width = when (widthMode) {
+            MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec)
+            MeasureSpec.AT_MOST -> Math.min(MeasureSpec.getSize(widthMeasureSpec), desiredWidth)
+            MeasureSpec.UNSPECIFIED -> desiredWidth
+            else -> desiredWidth
+        }
+
+
+        // height
+        val desiredHeight = padding + textLayout.height + padding
+        val height = when (heightMode) {
+            MeasureSpec.EXACTLY -> MeasureSpec.getSize(heightMeasureSpec)
+            MeasureSpec.AT_MOST -> Math.min(MeasureSpec.getSize(heightMeasureSpec), desiredHeight)
+            MeasureSpec.UNSPECIFIED -> desiredHeight
+            else -> desiredHeight
+        }
+
+        setMeasuredDimension(width, height)
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, w, h, h / 2f)
+                outline.setRoundRect(0, 0, width, height, height / 2f)
             }
         }
-        touchFeedbackDrawable.setBounds(0, 0, w, h)
+        touchFeedbackDrawable.setBounds(0, 0, width, height)
     }
 
     @CallSuper
@@ -238,7 +256,7 @@ class CheckableChipView @JvmOverloads constructor(
             // Draws beyond bounds and relies on clipToOutline to enforce pill shape
             val dotRadius = lerp(
                     strokeWidth + iconRadius,
-                    width.toFloat(),
+                    Math.max(width.toFloat(), height.toFloat()),
                     progress
             )
             canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
