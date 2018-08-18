@@ -40,11 +40,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.getColorOrThrow
-import androidx.core.content.res.getDimensionOrThrow
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.content.res.getDrawableOrThrow
-import androidx.core.content.res.getStringOrThrow
+import androidx.core.content.res.*
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 
@@ -121,17 +117,6 @@ class CheckableChipView @JvmOverloads constructor(
             textPaint.textSize = value
             updateContentDescription()
             requestLayout()
-        }
-
-    /**
-     * Controls the indicator visibility. default true
-     */
-    var showIcons: Boolean = true
-        set(value) {
-            if (field != value) {
-                field = value
-                requestLayout()
-            }
         }
 
     /**
@@ -218,7 +203,6 @@ class CheckableChipView @JvmOverloads constructor(
         }
         padding = a.getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
         isChecked = a.getBoolean(R.styleable.CheckableChipView_android_checked, false)
-        showIcons = a.getBoolean(R.styleable.CheckableChipView_showIcons, true)
         a.recycle()
         clipToOutline = true
     }
@@ -228,7 +212,7 @@ class CheckableChipView @JvmOverloads constructor(
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 
         // width
-        val nonTextWidth = (4 * padding) + (2 * outlinePaint.strokeWidth).toInt() + if (showIcons) clearDrawable.intrinsicWidth else 0
+        val nonTextWidth = (4 * padding) + (2 * outlinePaint.strokeWidth).toInt() + clearDrawable.intrinsicWidth
         val availableTextWidth = when (widthMode) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
             MeasureSpec.AT_MOST -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
@@ -270,7 +254,7 @@ class CheckableChipView @JvmOverloads constructor(
         val iconRadius = clearDrawable.intrinsicWidth / 2f
         val halfStroke = strokeWidth / 2f
         val rounding = (height - strokeWidth) / 2f
-
+        
         // Outline
         if (progress < 1f) {
             canvas.drawRoundRect(
@@ -285,36 +269,20 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
         // Tag color dot/background
-        if (showIcons) {
-            // Draws beyond bounds and relies on clipToOutline to enforce pill shape
-            val dotRadius = lerp(
-                strokeWidth + iconRadius,
-                Math.max(width.toFloat(), height.toFloat()),
-                progress
-            )
-            canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
-        } else {
-            canvas.drawRoundRect(
-                halfStroke,
-                halfStroke,
-                width - halfStroke,
-                height - halfStroke,
-                rounding,
-                rounding,
-                dotPaint
-            )
-        }
+        // Draws beyond bounds and relies on clipToOutline to enforce pill shape
+        val dotRadius = lerp(
+            strokeWidth + iconRadius,
+            Math.max(width.toFloat(), height.toFloat()),
+            progress
+        )
+        canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
 
         // Text
-        val textX = if (showIcons) {
-            lerp(
-                strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
-                strokeWidth + padding * 2f,
-                progress
-            )
-        } else {
-            strokeWidth + padding * 2f
-        }
+        val textX = lerp(
+            strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
+            strokeWidth + padding * 2f,
+            progress
+        )
 
         textPaint.color = when {
             checkedTextColor == 0 -> defaultTextColor
@@ -329,7 +297,7 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
         // Clear icon
-        if (showIcons && progress > 0f) {
+        if (progress > 0f) {
             canvas.withTranslation(
                 x = width - strokeWidth - padding - iconRadius,
                 y = height / 2f

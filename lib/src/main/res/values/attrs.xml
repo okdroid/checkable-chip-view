@@ -36,7 +36,6 @@
 
         <attr name="clearIcon" format="reference"/>
         <attr name="foreground" format="reference"/>
-        <attr name="showIcons" format="boolean"/>
     </declare-styleable>
 
     <style name="Widget.ChipView" parent="">
@@ -52,6 +51,5 @@
 
         <item name="clearIcon">@drawable/tag_clear</item>
         <item name="foreground">?android:selectableItemBackground</item>
-        <item name="showIcons">true</item>
     </style>
 </resources>
