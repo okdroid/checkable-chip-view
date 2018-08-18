@@ -16,7 +16,6 @@
 
 package com.github.okdroid.checkablechipview
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -164,12 +163,10 @@ class CheckableChipView @JvmOverloads constructor(
 
     private val clearDrawable: Drawable
 
-    private val touchFeedbackDrawable: Drawable
-
     private lateinit var textLayout: StaticLayout
 
     private val progressAnimator: ValueAnimator by lazy {
-        ObjectAnimator.ofFloat().apply {
+        ValueAnimator.ofFloat().apply {
             interpolator = AnimationUtils.loadInterpolator(context, android.R.interpolator.fast_out_slow_in)
         }
     }
@@ -197,9 +194,6 @@ class CheckableChipView @JvmOverloads constructor(
             setBounds(
                 -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
             )
-        }
-        touchFeedbackDrawable = a.getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
-            callback = this@CheckableChipView
         }
         padding = a.getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
         isChecked = a.getBoolean(R.styleable.CheckableChipView_android_checked, false)
@@ -243,7 +237,6 @@ class CheckableChipView @JvmOverloads constructor(
                 outline.setRoundRect(0, 0, width, height, height / 2f)
             }
         }
-        touchFeedbackDrawable.setBounds(0, 0, width, height)
     }
 
     @CallSuper
@@ -254,7 +247,7 @@ class CheckableChipView @JvmOverloads constructor(
         val iconRadius = clearDrawable.intrinsicWidth / 2f
         val halfStroke = strokeWidth / 2f
         val rounding = (height - strokeWidth) / 2f
-        
+
         // Outline
         if (progress < 1f) {
             canvas.drawRoundRect(
@@ -307,9 +300,6 @@ class CheckableChipView @JvmOverloads constructor(
                 }
             }
         }
-
-        // Touch feedback
-        touchFeedbackDrawable.draw(canvas)
     }
 
     /**
@@ -319,7 +309,7 @@ class CheckableChipView @JvmOverloads constructor(
         val newProgress = if (checked) 1f else 0f
         if (newProgress != progress) {
             progressAnimator.apply {
-                removeAllUpdateListeners()
+                removeAllListeners()
                 cancel()
                 setFloatValues(progress, newProgress)
                 duration = if (checked) CHECKING_DURATION else UNCHECKING_DURATION
@@ -343,25 +333,6 @@ class CheckableChipView @JvmOverloads constructor(
 
     override fun setChecked(checked: Boolean) {
         progress = if (checked) 1f else 0f
-    }
-
-    override fun verifyDrawable(who: Drawable?): Boolean {
-        return super.verifyDrawable(who) || who == touchFeedbackDrawable
-    }
-
-    override fun drawableStateChanged() {
-        super.drawableStateChanged()
-        touchFeedbackDrawable.state = drawableState
-    }
-
-    override fun jumpDrawablesToCurrentState() {
-        super.jumpDrawablesToCurrentState()
-        touchFeedbackDrawable.jumpToCurrentState()
-    }
-
-    override fun drawableHotspotChanged(x: Float, y: Float) {
-        super.drawableHotspotChanged(x, y)
-        touchFeedbackDrawable.setHotspot(x, y)
     }
 
     private fun createLayout(textWidth: Int) {

@@ -35,7 +35,6 @@
         <attr name="outlineWidth" format="dimension"/>
 
         <attr name="clearIcon" format="reference"/>
-        <attr name="foreground" format="reference"/>
     </declare-styleable>
 
     <style name="Widget.ChipView" parent="">
@@ -50,6 +49,6 @@
         <item name="android:color">#BBBBBB</item>
 
         <item name="clearIcon">@drawable/tag_clear</item>
-        <item name="foreground">?android:selectableItemBackground</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 </resources>
