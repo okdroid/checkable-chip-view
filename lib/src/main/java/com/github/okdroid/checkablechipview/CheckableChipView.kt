@@ -16,7 +16,6 @@
 
 package com.github.okdroid.checkablechipview
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -40,11 +39,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.getColorOrThrow
-import androidx.core.content.res.getDimensionOrThrow
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.content.res.getDrawableOrThrow
-import androidx.core.content.res.getStringOrThrow
+import androidx.core.content.res.*
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 
@@ -124,17 +119,6 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
     /**
-     * Controls the indicator visibility. default true
-     */
-    var showIcons: Boolean = true
-        set(value) {
-            if (field != value) {
-                field = value
-                requestLayout()
-            }
-        }
-
-    /**
      * Controls the color of the outline
      */
     var outlineColor: Int = 0
@@ -179,12 +163,10 @@ class CheckableChipView @JvmOverloads constructor(
 
     private val clearDrawable: Drawable
 
-    private val touchFeedbackDrawable: Drawable
-
     private lateinit var textLayout: StaticLayout
 
     private val progressAnimator: ValueAnimator by lazy {
-        ObjectAnimator.ofFloat().apply {
+        ValueAnimator.ofFloat().apply {
             interpolator = AnimationUtils.loadInterpolator(context, android.R.interpolator.fast_out_slow_in)
         }
     }
@@ -213,12 +195,8 @@ class CheckableChipView @JvmOverloads constructor(
                 -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
             )
         }
-        touchFeedbackDrawable = a.getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
-            callback = this@CheckableChipView
-        }
         padding = a.getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
         isChecked = a.getBoolean(R.styleable.CheckableChipView_android_checked, false)
-        showIcons = a.getBoolean(R.styleable.CheckableChipView_showIcons, true)
         a.recycle()
         clipToOutline = true
     }
@@ -228,7 +206,7 @@ class CheckableChipView @JvmOverloads constructor(
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 
         // width
-        val nonTextWidth = (4 * padding) + (2 * outlinePaint.strokeWidth).toInt() + if (showIcons) clearDrawable.intrinsicWidth else 0
+        val nonTextWidth = (4 * padding) + (2 * outlinePaint.strokeWidth).toInt() + clearDrawable.intrinsicWidth
         val availableTextWidth = when (widthMode) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
             MeasureSpec.AT_MOST -> MeasureSpec.getSize(widthMeasureSpec) - nonTextWidth
@@ -259,7 +237,6 @@ class CheckableChipView @JvmOverloads constructor(
                 outline.setRoundRect(0, 0, width, height, height / 2f)
             }
         }
-        touchFeedbackDrawable.setBounds(0, 0, width, height)
     }
 
     @CallSuper
@@ -285,36 +262,20 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
         // Tag color dot/background
-        if (showIcons) {
-            // Draws beyond bounds and relies on clipToOutline to enforce pill shape
-            val dotRadius = lerp(
-                strokeWidth + iconRadius,
-                Math.max(width.toFloat(), height.toFloat()),
-                progress
-            )
-            canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
-        } else {
-            canvas.drawRoundRect(
-                halfStroke,
-                halfStroke,
-                width - halfStroke,
-                height - halfStroke,
-                rounding,
-                rounding,
-                dotPaint
-            )
-        }
+        // Draws beyond bounds and relies on clipToOutline to enforce pill shape
+        val dotRadius = lerp(
+            strokeWidth + iconRadius,
+            Math.max(width.toFloat(), height.toFloat()),
+            progress
+        )
+        canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
 
         // Text
-        val textX = if (showIcons) {
-            lerp(
-                strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
-                strokeWidth + padding * 2f,
-                progress
-            )
-        } else {
-            strokeWidth + padding * 2f
-        }
+        val textX = lerp(
+            strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
+            strokeWidth + padding * 2f,
+            progress
+        )
 
         textPaint.color = when {
             checkedTextColor == 0 -> defaultTextColor
@@ -329,7 +290,7 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
         // Clear icon
-        if (showIcons && progress > 0f) {
+        if (progress > 0f) {
             canvas.withTranslation(
                 x = width - strokeWidth - padding - iconRadius,
                 y = height / 2f
@@ -339,9 +300,6 @@ class CheckableChipView @JvmOverloads constructor(
                 }
             }
         }
-
-        // Touch feedback
-        touchFeedbackDrawable.draw(canvas)
     }
 
     /**
@@ -351,7 +309,7 @@ class CheckableChipView @JvmOverloads constructor(
         val newProgress = if (checked) 1f else 0f
         if (newProgress != progress) {
             progressAnimator.apply {
-                removeAllUpdateListeners()
+                removeAllListeners()
                 cancel()
                 setFloatValues(progress, newProgress)
                 duration = if (checked) CHECKING_DURATION else UNCHECKING_DURATION
@@ -375,25 +333,6 @@ class CheckableChipView @JvmOverloads constructor(
 
     override fun setChecked(checked: Boolean) {
         progress = if (checked) 1f else 0f
-    }
-
-    override fun verifyDrawable(who: Drawable?): Boolean {
-        return super.verifyDrawable(who) || who == touchFeedbackDrawable
-    }
-
-    override fun drawableStateChanged() {
-        super.drawableStateChanged()
-        touchFeedbackDrawable.state = drawableState
-    }
-
-    override fun jumpDrawablesToCurrentState() {
-        super.jumpDrawablesToCurrentState()
-        touchFeedbackDrawable.jumpToCurrentState()
-    }
-
-    override fun drawableHotspotChanged(x: Float, y: Float) {
-        super.drawableHotspotChanged(x, y)
-        touchFeedbackDrawable.setHotspot(x, y)
     }
 
     private fun createLayout(textWidth: Int) {
