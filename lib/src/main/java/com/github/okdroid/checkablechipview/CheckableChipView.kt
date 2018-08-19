@@ -33,6 +33,7 @@ import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
@@ -54,14 +55,14 @@ class CheckableChipView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr), Checkable {
 
     companion object {
-        private const val CHECKING_DURATION = 350L
-        private const val UNCHECKING_DURATION = 200L
+        private const val CHECKING_DURATION = 350L // ms
+        private const val UNCHECKING_DURATION = 200L // ms
     }
 
     /**
      * Sets the indicator and background color when the widget is checked.
      */
-    var checkedColor: Int = 0xffff00ff.toInt()
+    var checkedColor: Int = 0
         set(value) {
             if (field != value) {
                 field = value
@@ -74,7 +75,7 @@ class CheckableChipView @JvmOverloads constructor(
      * Sets the text color to be used when the widget is not checked.
      */
     @ColorInt
-    var defaultTextColor: Int = Color.BLACK
+    var defaultTextColor: Int = 0
         set(value) {
             if (field != value) {
                 field = value
@@ -86,7 +87,7 @@ class CheckableChipView @JvmOverloads constructor(
     /**
      * Sets the text color to be used when the widget is checked.
      */
-    var checkedTextColor: Int = Color.TRANSPARENT
+    var checkedTextColor: Int = 0
         set(value) {
             if (field != value) {
                 field = value
@@ -119,7 +120,7 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
     /**
-     * Controls the color of the outline
+     * Controls the color of the outline.
      */
     var outlineColor: Int = 0
         set(value) {
@@ -131,7 +132,7 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
     /**
-     * Controls the stroke width of the outline
+     * Controls the stroke width of the outline.
      */
     var outlineWidth: Float = 0f
         set(value) {
@@ -142,6 +143,11 @@ class CheckableChipView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Sets the listener to be called when the checked state changes.     *
+     */
+    var onCheckedChangeListener: OnCheckedChangeListener? = null
+
     private var progress = 0f
         set(value) {
             if (field != value) {
@@ -149,6 +155,7 @@ class CheckableChipView @JvmOverloads constructor(
                 postInvalidateOnAnimation()
                 if (value == 0f || value == 1f) {
                     updateContentDescription()
+                    onCheckedChangeListener?.onCheckedChanged(this, isChecked)
                 }
             }
         }
@@ -199,6 +206,7 @@ class CheckableChipView @JvmOverloads constructor(
         isChecked = a.getBoolean(R.styleable.CheckableChipView_android_checked, false)
         a.recycle()
         clipToOutline = true
+        isClickable = true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -325,10 +333,19 @@ class CheckableChipView @JvmOverloads constructor(
         }
     }
 
+    override fun performClick(): Boolean {
+        setCheckedAnimated(!isChecked, null)
+        val handled = super.performClick()
+        if (!handled) {
+            playSoundEffect(SoundEffectConstants.CLICK);
+        }
+        return handled
+    }
+
     override fun isChecked() = progress == 1f
 
     override fun toggle() {
-        progress = if (progress == 0f) 1f else 0f
+        isChecked = !isChecked
     }
 
     override fun setChecked(checked: Boolean) {
@@ -348,4 +365,14 @@ class CheckableChipView @JvmOverloads constructor(
         val desc = if (isChecked) R.string.a11y_filter_applied else R.string.a11y_filter_not_applied
         contentDescription = resources.getString(desc, text)
     }
+}
+
+interface OnCheckedChangeListener {
+    /**
+     * Called when the checked state of a CheckableTextView changed
+     *
+     * @param view The CheckableTextView whose state has changed.
+     * @param isChecked True if the CheckableTextView is checked now
+     */
+    fun onCheckedChanged(view: CheckableChipView, isChecked: Boolean)
 }
