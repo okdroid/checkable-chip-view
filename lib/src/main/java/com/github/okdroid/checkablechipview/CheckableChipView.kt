@@ -115,7 +115,9 @@ class CheckableChipView @JvmOverloads constructor(
     private val outlinePaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private val indicatorPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+
     private lateinit var clearDrawable: Drawable
+    private lateinit var touchFeedbackDrawable: Drawable
 
     private lateinit var textLayout: StaticLayout
 
@@ -154,6 +156,9 @@ class CheckableChipView @JvmOverloads constructor(
                 setBounds(
                     -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
                 )
+            }
+            touchFeedbackDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
+                callback = this@CheckableChipView
             }
             padding = getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
             isChecked = getBoolean(R.styleable.CheckableChipView_android_checked, false)
@@ -196,6 +201,7 @@ class CheckableChipView @JvmOverloads constructor(
                 outline.setRoundRect(0, 0, width, height, outlineCornerRadius ?: (height / 2f))
             }
         }
+        touchFeedbackDrawable.setBounds(0, 0, width, height)
     }
 
     @CallSuper
@@ -282,6 +288,9 @@ class CheckableChipView @JvmOverloads constructor(
                 }
             }
         }
+
+        // Touch feedback
+        touchFeedbackDrawable.draw(canvas)
     }
 
     /**
@@ -333,6 +342,25 @@ class CheckableChipView @JvmOverloads constructor(
             @Suppress("DEPRECATION")
             StaticLayout(text, textPaint, textWidth, ALIGN_NORMAL, 1f, 0f, true)
         }
+    }
+
+    override fun verifyDrawable(who: Drawable): Boolean {
+        return super.verifyDrawable(who) || who == touchFeedbackDrawable
+    }
+
+    override fun drawableStateChanged() {
+        super.drawableStateChanged()
+        touchFeedbackDrawable.state = drawableState
+    }
+
+    override fun jumpDrawablesToCurrentState() {
+        super.jumpDrawablesToCurrentState()
+        touchFeedbackDrawable.jumpToCurrentState()
+    }
+
+    override fun drawableHotspotChanged(x: Float, y: Float) {
+        super.drawableHotspotChanged(x, y)
+        touchFeedbackDrawable.setHotspot(x, y)
     }
 
     /**

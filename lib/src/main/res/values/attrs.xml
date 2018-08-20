@@ -35,6 +35,7 @@
         <attr name="outlineColor" format="color"/>
         <attr name="outlineWidth" format="dimension"/>
 
+        <attr name="foreground" format="reference"/>
         <attr name="clearIcon" format="reference"/>
     </declare-styleable>
 
@@ -50,6 +51,6 @@
         <item name="android:color">#BBBBBB</item>
 
         <item name="clearIcon">@drawable/tag_clear</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="foreground">?android:selectableItemBackground</item>
     </style>
 </resources>
