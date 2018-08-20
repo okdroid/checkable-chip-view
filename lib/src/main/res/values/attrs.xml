@@ -31,6 +31,7 @@
         <attr name="android:color"/>
         <attr name="android:padding"/>
 
+        <attr name="outlineCornerRadius" format="dimension" />
         <attr name="outlineColor" format="color"/>
         <attr name="outlineWidth" format="dimension"/>
 
