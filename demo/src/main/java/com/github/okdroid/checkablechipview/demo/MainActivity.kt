@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import com.github.okdroid.checkablechipview.CheckableChipView
-import com.github.okdroid.checkablechipview.OnCheckedChangeListener
 
 class MainActivity : Activity() {
 
@@ -19,10 +18,10 @@ class MainActivity : Activity() {
         )
 
         chips.forEach { chip ->
-            chip.onCheckedChangeListener = object : OnCheckedChangeListener {
-                override fun onCheckedChanged(view: CheckableChipView, isChecked: Boolean) {
-                    Toast.makeText(this@MainActivity, "${chip.text}: ${chip.isChecked}", Toast.LENGTH_SHORT).show()
-                }
+            chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
+                Toast
+                    .makeText(this@MainActivity, "${view.text} checked: $isChecked", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }

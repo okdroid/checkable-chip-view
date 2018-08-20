@@ -144,9 +144,9 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
     /**
-     * Sets the listener to be called when the checked state changes.     *
+     * Sets the listener to be called when the checked state changes.
      */
-    var onCheckedChangeListener: OnCheckedChangeListener? = null
+    var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
     private var progress = 0f
         set(value) {
@@ -155,7 +155,7 @@ class CheckableChipView @JvmOverloads constructor(
                 postInvalidateOnAnimation()
                 if (value == 0f || value == 1f) {
                     updateContentDescription()
-                    onCheckedChangeListener?.onCheckedChanged(this, isChecked)
+                    onCheckedChangeListener?.invoke(this, isChecked)
                 }
             }
         }
@@ -365,14 +365,4 @@ class CheckableChipView @JvmOverloads constructor(
         val desc = if (isChecked) R.string.a11y_filter_applied else R.string.a11y_filter_not_applied
         contentDescription = resources.getString(desc, text)
     }
-}
-
-interface OnCheckedChangeListener {
-    /**
-     * Called when the checked state of a CheckableTextView changed
-     *
-     * @param view The CheckableTextView whose state has changed.
-     * @param isChecked True if the CheckableTextView is checked now
-     */
-    fun onCheckedChanged(view: CheckableChipView, isChecked: Boolean)
 }
