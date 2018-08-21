@@ -59,6 +59,13 @@ chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
 }
 ```
 
+To switch between checked/unchecked state programatically, use the following method:
+```kotlin
+chip.setCheckedAnimated(checked = true) {
+    // onAnimationEnd callback
+}
+```
+
 ## Acknowledgements
 Thanks to the team behind the [Google I/O app](https://github.com/google/iosched). Thank you for open sourcing the code and letting others reuse and learn from it.
 
