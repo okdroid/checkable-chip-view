@@ -48,7 +48,7 @@
 
         <item name="android:color">#BBBBBB</item>
 
-        <item name="ccv_clearIcon">@drawable/tag_clear</item>
+        <item name="ccv_clearIcon">@drawable/ccv_tag_clear</item>
         <item name="ccv_foreground">?android:selectableItemBackground</item>
     </style>
 </resources>
