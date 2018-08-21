@@ -56,6 +56,11 @@ chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
 }
 ```
 
+## Acknowledgements
+Thanks to the team behind the [Google I/O app](https://github.com/google/iosched). Thank you for open sourcing the code and letting others reuse and learn from it.
+
+Thanks to [Nick Butcher](https://github.com/nickbutcher) for the initial implementation in the I/O app.
+
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License");
