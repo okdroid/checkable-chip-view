@@ -4,7 +4,9 @@
 
 [![Travis (.org)](https://img.shields.io/travis/markushi/checkable-chip-view.svg?style=for-the-badge)](https://travis-ci.org/okdroid/checkable-chip-view) [![Bintray](https://img.shields.io/bintray/v/markushi/maven/checkablechipview.svg?style=for-the-badge)](https://bintray.com/markushi/maven/checkablechipview)
 
-A checkable widget for Android. Based on the [EventFilterView from the Google I/O 2018 app](https://github.com/google/iosched/blob/2696fc7e06826ba2db72de243f0d63f83f4a29b5/mobile/src/main/java/com/google/samples/apps/iosched/ui/schedule/filters/EventFilterView.kt).
+A checkable widget for Android. Based on the [EventFilterView from the Google I/O 2018 app](https://github.com/google/iosched/blob/2696fc7e06826ba2db72de243f0d63f83f4a29b5/mobile/src/main/java/com/google/samples/apps/iosched/ui/schedule/filters/EventFilterView.kt). 
+
+Requires Android `minSdkVersion` 21.
 
 ![](demo.gif)
 
@@ -35,14 +37,17 @@ Include the widget into your xml layout like this
         android:text="Pie Cake" />
 ```
 
-The following custom attributes are supported
+The following xml attributes are supported
 
-| Attribute                 | Description                                                  |
-| ------------------------- | ------------------------------------------------------------ |
-| `ccv_outlineColor`        | Color of the outline                                         |
-| `ccv_outlineCornerRadius` | Corner radius of the outline, in dp. If not set defaults to a pill shape. |
-| `ccv_outlineWidth`        | The stroke width of the outline, in dp                       |
-| `ccv_checkedTextColor`    | the text color when the widget is checked                    |
+| Attribute                     | Description                                                  |
+| ----------------------------- | ------------------------------------------------------------ |
+| `android:text`                | The text to display                                          |
+| `android:color`               | The color of the indicator dot as well as the background color when the widget is checked |
+| `android:checked`             | The checked state of the widget, either true or false        |
+| `app:ccv_outlineColor`        | Color of the outline                                         |
+| `app:ccv_outlineCornerRadius` | Corner radius of the outline, in dp. If not set defaults to a pill shape |
+| `app:ccv_outlineWidth`        | The stroke width of the outline, in dp                       |
+| `app:ccv_checkedTextColor`    | The text color when the widget is checked                    |
 
 The state of the widget can be observed like this
 ```kotlin
