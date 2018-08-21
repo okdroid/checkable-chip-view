@@ -65,7 +65,6 @@ Thanks to the team behind the [Google I/O app](https://github.com/google/iosched
 Thanks to [Nick Butcher](https://github.com/nickbutcher) for the initial implementation in the I/O app.
 
 ## License
---------
     Copyright 2018 Google, Inc.
     Copyright 2018 okdroid
 
