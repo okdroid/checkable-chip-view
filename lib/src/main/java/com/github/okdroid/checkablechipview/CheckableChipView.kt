@@ -103,10 +103,6 @@ class CheckableChipView @JvmOverloads constructor(
      */
     var outlineCornerRadius: Float? by viewProperty(null)
 
-    /**
-     * Sets the listener to be called when the checked state changes.
-     */
-    var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
     private var targetProgress: Float = 0f
 
@@ -125,6 +121,8 @@ class CheckableChipView @JvmOverloads constructor(
     private lateinit var touchFeedbackDrawable: Drawable
 
     private lateinit var textLayout: StaticLayout
+
+    private var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
     private val progressAnimator: ValueAnimator by lazy {
         ValueAnimator.ofFloat().apply {
@@ -294,6 +292,10 @@ class CheckableChipView @JvmOverloads constructor(
 
         // Touch feedback
         touchFeedbackDrawable.draw(canvas)
+    }
+
+    fun setOnCheckedChangeListener(onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)?) {
+        this.onCheckedChangeListener = onCheckedChangeListener
     }
 
     /**

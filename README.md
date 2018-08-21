@@ -57,7 +57,7 @@ The following xml attributes are supported
 ### In code
 The state of the widget can be observed like this
 ```kotlin
-chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
+chip.setOnCheckedChangeListener { view, isChecked ->
     // do your logic here
 }
 ```
