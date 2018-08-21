@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Sample 1"
-            app:outlineColor="#FFC107"/>
+            app:ccv_outlineColor="#FFC107"/>
 
     <com.github.okdroid.checkablechipview.CheckableChipView
             android:id="@+id/chip2"
@@ -30,10 +30,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Sample 2"
-            app:outlineCornerRadius="4dp"
             android:color="@color/colorAccent"
-            app:outlineColor="@color/colorAccent"
-            app:checkedTextColor="?android:textColorPrimaryInverse"
-            app:outlineWidth="4dp"/>
+            app:ccv_outlineColor="@color/colorAccent"
+            app:ccv_outlineCornerRadius="6dp"
+            app:ccv_checkedTextColor="?android:textColorPrimaryInverse"
+            app:ccv_outlineWidth="2dp"/>
 
 </LinearLayout>

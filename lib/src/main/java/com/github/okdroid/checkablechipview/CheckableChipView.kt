@@ -1,5 +1,7 @@
 /*
  * Copyright 2018 Google LLC
+ * Copyright 2018 markushi
+ * Copyright 2018 rom4ek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +40,11 @@ import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.*
+import androidx.core.content.res.getColorOrThrow
+import androidx.core.content.res.getDimensionOrThrow
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
+import androidx.core.content.res.getDrawableOrThrow
+import androidx.core.content.res.getStringOrThrow
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
@@ -134,27 +140,27 @@ class CheckableChipView @JvmOverloads constructor(
             set = attrs,
             attrs = R.styleable.CheckableChipView,
             defStyleAttr = R.attr.checkableChipViewStyle,
-            defStyleRes = R.style.Widget_ChipView
+            defStyleRes = R.style.Widget_CheckableChipView
         ) {
-            outlineColor = getColorOrThrow(R.styleable.CheckableChipView_outlineColor)
-            outlineWidth = getDimensionOrThrow(R.styleable.CheckableChipView_outlineWidth)
-            if (hasValue(R.styleable.CheckableChipView_outlineCornerRadius)) {
-                outlineCornerRadius = getDimensionOrThrow(R.styleable.CheckableChipView_outlineCornerRadius)
+            outlineColor = getColorOrThrow(R.styleable.CheckableChipView_ccv_outlineColor)
+            outlineWidth = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineWidth)
+            if (hasValue(R.styleable.CheckableChipView_ccv_outlineCornerRadius)) {
+                outlineCornerRadius = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineCornerRadius)
             }
 
             checkedColor = getColor(R.styleable.CheckableChipView_android_color, checkedColor)
-            checkedTextColor = getColor(R.styleable.CheckableChipView_checkedTextColor, Color.TRANSPARENT)
+            checkedTextColor = getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, Color.TRANSPARENT)
             defaultTextColor = getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
 
             text = getStringOrThrow(R.styleable.CheckableChipView_android_text)
             textSize = getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
 
-            clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_clearIcon).apply {
+            clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon).apply {
                 setBounds(
                     -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
                 )
             }
-            touchFeedbackDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_foreground).apply {
+            touchFeedbackDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_foreground).apply {
                 callback = this@CheckableChipView
             }
             padding = getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
