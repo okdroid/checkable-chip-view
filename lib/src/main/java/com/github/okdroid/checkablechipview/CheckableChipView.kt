@@ -40,7 +40,11 @@ import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.*
+import androidx.core.content.res.getColorOrThrow
+import androidx.core.content.res.getDimensionOrThrow
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
+import androidx.core.content.res.getDrawableOrThrow
+import androidx.core.content.res.getStringOrThrow
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 
@@ -66,7 +70,7 @@ class CheckableChipView @JvmOverloads constructor(
         set(value) {
             if (field != value) {
                 field = value
-                dotPaint.color = value
+                indicatorPaint.color = value
                 postInvalidateOnAnimation()
             }
         }
@@ -144,9 +148,20 @@ class CheckableChipView @JvmOverloads constructor(
         }
 
     /**
-     * Sets the listener to be called when the checked state changes.     *
+     * Controls the corner radius of the outline. If null the outline will be pill-shaped.
      */
-    var onCheckedChangeListener: OnCheckedChangeListener? = null
+    var outlineCornerRadius: Float? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidateOnAnimation()
+            }
+        }
+
+    /**
+     * Sets the listener to be called when the checked state changes.
+     */
+    var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
     private var progress = 0f
         set(value) {
@@ -155,7 +170,7 @@ class CheckableChipView @JvmOverloads constructor(
                 postInvalidateOnAnimation()
                 if (value == 0f || value == 1f) {
                     updateContentDescription()
-                    onCheckedChangeListener?.onCheckedChanged(this, isChecked)
+                    onCheckedChangeListener?.invoke(this, isChecked)
                 }
             }
         }
@@ -166,7 +181,7 @@ class CheckableChipView @JvmOverloads constructor(
 
     private val textPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
-    private val dotPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    private val indicatorPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
     private val clearDrawable: Drawable
 
@@ -189,6 +204,9 @@ class CheckableChipView @JvmOverloads constructor(
         outlinePaint.style = STROKE
         outlineColor = a.getColorOrThrow(R.styleable.CheckableChipView_outlineColor)
         outlineWidth = a.getDimensionOrThrow(R.styleable.CheckableChipView_outlineWidth)
+        if (a.hasValue(R.styleable.CheckableChipView_outlineCornerRadius)) {
+            outlineCornerRadius = a.getDimensionOrThrow(R.styleable.CheckableChipView_outlineCornerRadius)
+        }
 
         checkedColor = a.getColor(R.styleable.CheckableChipView_android_color, checkedColor)
         checkedTextColor = a.getColor(R.styleable.CheckableChipView_checkedTextColor, Color.TRANSPARENT)
@@ -242,7 +260,7 @@ class CheckableChipView @JvmOverloads constructor(
         setMeasuredDimension(width, height)
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, width, height, height / 2f)
+                outline.setRoundRect(0, 0, width, height, outlineCornerRadius ?: (height / 2f))
             }
         }
     }
@@ -251,10 +269,10 @@ class CheckableChipView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val strokeWidth = outlinePaint.strokeWidth
         val iconRadius = clearDrawable.intrinsicWidth / 2f
+        val strokeWidth = outlinePaint.strokeWidth
         val halfStroke = strokeWidth / 2f
-        val rounding = (height - strokeWidth) / 2f
+        val rounding = outlineCornerRadius ?: (height - strokeWidth) / 2f
 
         // Outline
         if (progress < 1f) {
@@ -269,19 +287,35 @@ class CheckableChipView @JvmOverloads constructor(
             )
         }
 
-        // Tag color dot/background
-        // Draws beyond bounds and relies on clipToOutline to enforce pill shape
-        val dotRadius = lerp(
-            strokeWidth + iconRadius,
-            Math.max(width.toFloat(), height.toFloat()),
+        // Draws beyond bounds and relies on clipToOutline to enforce shape
+        val initialIndicatorSize = clearDrawable.intrinsicWidth.toFloat()
+        val indicatorCenterX = strokeWidth + padding + padding / 2f + initialIndicatorSize / 2f
+        val indicatorCenterY = height / 2f
+
+        val indicatorSize = lerp(
+            initialIndicatorSize,
+            Math.max((width - indicatorCenterX) * 2f, (height - indicatorCenterY) * 2f),
             progress
         )
-        canvas.drawCircle(strokeWidth + padding + iconRadius, height / 2f, dotRadius, dotPaint)
+
+        val indicatorSizeHalf = indicatorSize / 2f
+
+        val indicatorRounding = (rounding / (height - strokeWidth)) * (indicatorSizeHalf * 2f)
+
+        canvas.drawRoundRect(
+            indicatorCenterX - indicatorSizeHalf,
+            indicatorCenterY - indicatorSizeHalf,
+            indicatorCenterX + indicatorSizeHalf,
+            indicatorCenterY + indicatorSizeHalf,
+            indicatorRounding,
+            indicatorRounding,
+            indicatorPaint
+        )
 
         // Text
         val textX = lerp(
-            strokeWidth + padding + clearDrawable.intrinsicWidth + padding,
-            strokeWidth + padding * 2f,
+            indicatorCenterX + initialIndicatorSize / 2f + padding,
+            strokeWidth + padding + padding / 2f,
             progress
         )
 
@@ -337,7 +371,7 @@ class CheckableChipView @JvmOverloads constructor(
         setCheckedAnimated(!isChecked, null)
         val handled = super.performClick()
         if (!handled) {
-            playSoundEffect(SoundEffectConstants.CLICK);
+            playSoundEffect(SoundEffectConstants.CLICK)
         }
         return handled
     }
@@ -365,14 +399,4 @@ class CheckableChipView @JvmOverloads constructor(
         val desc = if (isChecked) R.string.a11y_filter_applied else R.string.a11y_filter_not_applied
         contentDescription = resources.getString(desc, text)
     }
-}
-
-interface OnCheckedChangeListener {
-    /**
-     * Called when the checked state of a CheckableTextView changed
-     *
-     * @param view The CheckableTextView whose state has changed.
-     * @param isChecked True if the CheckableTextView is checked now
-     */
-    fun onCheckedChanged(view: CheckableChipView, isChecked: Boolean)
 }
