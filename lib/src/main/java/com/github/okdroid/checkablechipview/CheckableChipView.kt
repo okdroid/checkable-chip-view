@@ -22,7 +22,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Paint
-import android.graphics.Paint.Style.STROKE
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
@@ -112,7 +111,7 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     private var padding: Int = 0
-    private val outlinePaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    private val outlinePaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val textPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private val indicatorPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
@@ -128,8 +127,6 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     init {
-        outlinePaint.style = STROKE
-
         clipToOutline = true
         isClickable = true
 
@@ -296,7 +293,7 @@ class CheckableChipView @JvmOverloads constructor(
     /**
      * Starts the animation to enable/disable a filter and invokes a function when done.
      */
-    private fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
+    fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
         val newProgress = if (checked) 1f else 0f
         if (newProgress != progress) {
             progressAnimator.apply {
