@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import com.github.okdroid.checkablechipview.CheckableChipView
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
 
@@ -11,11 +12,7 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val chips = listOf<CheckableChipView>(
-            findViewById(R.id.chip0),
-            findViewById(R.id.chip1),
-            findViewById(R.id.chip2)
-        )
+        val chips = listOf<CheckableChipView>(chip0, chip1, chip2)
 
         chips.forEach { chip ->
             chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
