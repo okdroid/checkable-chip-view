@@ -1,53 +1,72 @@
+/*
+ * Copyright 2018 markushi
+ * Copyright 2018 rom4ek
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 
+def artifactGroup = 'com.github.okdroid'
+def artifactName = 'checkablechipview'
+def artifactVersion = '1.0.0'
 
 task sourceJar(type: Jar) {
-	from android.sourceSets.main.java.srcDirs
-	classifier "sources"
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
 }
 
 publishing {
-	publications {
-		Production(MavenPublication) {
-			artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
-			artifact(sourceJar)
+    publications {
+        Production(MavenPublication) {
+            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact(sourceJar)
 
-			groupId 'com.github.okdroid'
-			artifactId 'checkablechipview'
-			version '0.0.9'
+            groupId artifactGroup
+            artifactId artifactName
+            version artifactVersion
 
-			pom.withXml {
-				def dependencies = asNode().appendNode('dependencies')
-				configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
-					def dependency = dependencies.appendNode('dependency')
-					dependency.appendNode('groupId', it.moduleGroup)
-					dependency.appendNode('artifactId', it.moduleName)
-					dependency.appendNode('version', it.moduleVersion)
-				}
-			}
-		}
-	}
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.moduleGroup)
+                    dependency.appendNode('artifactId', it.moduleName)
+                    dependency.appendNode('version', it.moduleVersion)
+                }
+            }
+        }
+    }
 }
 
 bintray {
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_API_KEY')
-	dryRun = false
-	override = false
-	publish = true
-	pkg {
-		repo = 'maven'
-		name = 'checkablechipview'
-		userOrg = 'markushi'
-		licenses = ['Apache-2.0']
-		desc = 'Checkable Chipview for Android'
-		vcsUrl = 'https://github.com/okdroid/checkable-chip-view.git'
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_API_KEY')
+    dryRun = false
+    override = false
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'checkablechipview'
+        userOrg = 'markushi'
+        licenses = ['Apache-2.0']
+        desc = 'Checkable Chipview for Android'
+        vcsUrl = 'https://github.com/okdroid/checkable-chip-view.git'
 
-		version {
-			name = '0.0.9'
-			vcsTag = '0.0.9'
-		}
-	}
-	publications = ['Production']
+        version {
+            name = artifactVersion
+        }
+    }
+    publications = ['Production']
 }

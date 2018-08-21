@@ -1,5 +1,7 @@
 /*
  * Copyright 2018 Google LLC
+ * Copyright 2018 markushi
+ * Copyright 2018 rom4ek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +23,7 @@ import android.text.StaticLayout
 /**
  * Calculated the widest line in a [StaticLayout].
  */
-fun StaticLayout.textWidth(): Int {
+internal fun StaticLayout.textWidth(): Int {
     var width = 0f
     for (i in 0 until lineCount) {
         width = width.coerceAtLeast(getLineWidth(i))
@@ -32,6 +34,6 @@ fun StaticLayout.textWidth(): Int {
 /**
  * Linearly interpolate between two values.
  */
-fun lerp(a: Float, b: Float, t: Float): Float {
+internal fun lerp(a: Float, b: Float, t: Float): Float {
     return a + (b - a) * t
 }

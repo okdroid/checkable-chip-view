@@ -1,5 +1,7 @@
 /*
  * Copyright 2018 Google LLC
+ * Copyright 2018 markushi
+ * Copyright 2018 rom4ek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +22,25 @@ apply plugin: 'kotlin-android-extensions'
 apply from: 'publish.gradle'
 
 android {
-	compileSdkVersion rootProject.compileSdkVersion
-	buildToolsVersion rootProject.buildToolsVersion
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
-	defaultConfig {
-		minSdkVersion rootProject.minSdkVersion
-		targetSdkVersion rootProject.targetSdkVersion
-	}
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+    }
 
-	buildTypes {
-		release {
-			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-		}
-	}
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
 
 }
 
 dependencies {
-	implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
+    implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
+    implementation "com.android.support:support-core-utils:$rootProject.appcompatVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$rootProject.kotlinVersion"
 }
