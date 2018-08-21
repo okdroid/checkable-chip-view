@@ -1,5 +1,7 @@
 /*
  * Copyright 2018 Google LLC
+ * Copyright 2018 markushi
+ * Copyright 2018 rom4ek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +24,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Paint
-import android.graphics.Paint.Style.STROKE
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
 import android.support.annotation.CallSuper
-import android.support.annotation.ColorInt
 import android.support.v4.graphics.ColorUtils
 import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.StaticLayout
@@ -45,8 +45,11 @@ import androidx.core.content.res.getDimensionOrThrow
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.content.res.getDrawableOrThrow
 import androidx.core.content.res.getStringOrThrow
+import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
+import kotlin.properties.ObservableProperty
+import kotlin.reflect.KProperty
 
 /**
  * A custom view for displaying filters. Allows a custom presentation of the tag color and selection
@@ -66,124 +69,60 @@ class CheckableChipView @JvmOverloads constructor(
     /**
      * Sets the indicator and background color when the widget is checked.
      */
-    var checkedColor: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                indicatorPaint.color = value
-                postInvalidateOnAnimation()
-            }
-        }
+    var checkedColor: Int by viewProperty(0) { indicatorPaint.color = it }
 
     /**
      * Sets the text color to be used when the widget is not checked.
      */
-    @ColorInt
-    var defaultTextColor: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                textPaint.color = value
-                postInvalidateOnAnimation()
-            }
-        }
-
+    var defaultTextColor: Int by viewProperty(0) { textPaint.color = it }
     /**
      * Sets the text color to be used when the widget is checked.
      */
-    var checkedTextColor: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                postInvalidateOnAnimation()
-            }
-        }
+    var checkedTextColor: Int by viewProperty(0)
 
     /**
      * Sets the text to be displayed.
      */
-    var text: CharSequence = ""
-        set(value) {
-            field = value
-            updateContentDescription()
-            requestLayout()
-        }
+    var text: CharSequence by viewProperty("", requestLayout = true)
 
     /**
      * Sets the textSize to be displayed.
      */
-    var textSize: Float = 0f
-        set(value) {
-            if (value < 0f) {
-                IllegalArgumentException("textSize can't be negative")
-            }
-            field = value
-            textPaint.textSize = value
-            updateContentDescription()
-            requestLayout()
-        }
+    var textSize: Float by viewProperty(0f, requestLayout = true) { textPaint.textSize = it }
 
     /**
      * Controls the color of the outline.
      */
-    var outlineColor: Int = 0
-        set(value) {
-            if (field != value) {
-                field = value
-                outlinePaint.color = value
-                postInvalidateOnAnimation()
-            }
-        }
+    var outlineColor: Int by viewProperty(0) { outlinePaint.color = it }
 
     /**
      * Controls the stroke width of the outline.
      */
-    var outlineWidth: Float = 0f
-        set(value) {
-            if (field != value) {
-                field = value
-                outlinePaint.strokeWidth = value
-                postInvalidateOnAnimation()
-            }
-        }
+    var outlineWidth: Float by viewProperty(0f) { outlinePaint.strokeWidth = it }
 
     /**
      * Controls the corner radius of the outline. If null the outline will be pill-shaped.
      */
-    var outlineCornerRadius: Float? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                postInvalidateOnAnimation()
-            }
-        }
+    var outlineCornerRadius: Float? by viewProperty(null)
 
     /**
      * Sets the listener to be called when the checked state changes.
      */
     var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
-    private var progress = 0f
-        set(value) {
-            if (field != value) {
-                field = value
-                postInvalidateOnAnimation()
-                if (value == 0f || value == 1f) {
-                    updateContentDescription()
-                    onCheckedChangeListener?.invoke(this, isChecked)
-                }
-            }
+    private var progress: Float by viewProperty(0f) {
+        if (it == 0f || it == 1f) {
+            onCheckedChangeListener?.invoke(this, isChecked)
         }
+    }
 
-    private val padding: Int
-
-    private val outlinePaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-
+    private var padding: Int = 0
+    private val outlinePaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val textPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-
     private val indicatorPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
-    private val clearDrawable: Drawable
+    private lateinit var clearDrawable: Drawable
+    private lateinit var touchFeedbackDrawable: Drawable
 
     private lateinit var textLayout: StaticLayout
 
@@ -194,37 +133,39 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     init {
-        val a = context.obtainStyledAttributes(
-            attrs,
-            R.styleable.CheckableChipView,
-            R.attr.checkableChipViewStyle,
-            R.style.Widget_ChipView
-        )
-
-        outlinePaint.style = STROKE
-        outlineColor = a.getColorOrThrow(R.styleable.CheckableChipView_outlineColor)
-        outlineWidth = a.getDimensionOrThrow(R.styleable.CheckableChipView_outlineWidth)
-        if (a.hasValue(R.styleable.CheckableChipView_outlineCornerRadius)) {
-            outlineCornerRadius = a.getDimensionOrThrow(R.styleable.CheckableChipView_outlineCornerRadius)
-        }
-
-        checkedColor = a.getColor(R.styleable.CheckableChipView_android_color, checkedColor)
-        checkedTextColor = a.getColor(R.styleable.CheckableChipView_checkedTextColor, Color.TRANSPARENT)
-        defaultTextColor = a.getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
-
-        text = a.getStringOrThrow(R.styleable.CheckableChipView_android_text)
-        textSize = a.getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
-
-        clearDrawable = a.getDrawableOrThrow(R.styleable.CheckableChipView_clearIcon).apply {
-            setBounds(
-                -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
-            )
-        }
-        padding = a.getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
-        isChecked = a.getBoolean(R.styleable.CheckableChipView_android_checked, false)
-        a.recycle()
         clipToOutline = true
         isClickable = true
+
+        context.withStyledAttributes(
+            set = attrs,
+            attrs = R.styleable.CheckableChipView,
+            defStyleAttr = R.attr.checkableChipViewStyle,
+            defStyleRes = R.style.Widget_CheckableChipView
+        ) {
+            outlineColor = getColorOrThrow(R.styleable.CheckableChipView_ccv_outlineColor)
+            outlineWidth = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineWidth)
+            if (hasValue(R.styleable.CheckableChipView_ccv_outlineCornerRadius)) {
+                outlineCornerRadius = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineCornerRadius)
+            }
+
+            checkedColor = getColor(R.styleable.CheckableChipView_android_color, checkedColor)
+            checkedTextColor = getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, Color.TRANSPARENT)
+            defaultTextColor = getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
+
+            text = getStringOrThrow(R.styleable.CheckableChipView_android_text)
+            textSize = getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
+
+            clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon).apply {
+                setBounds(
+                    -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
+                )
+            }
+            touchFeedbackDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_foreground).apply {
+                callback = this@CheckableChipView
+            }
+            padding = getDimensionPixelSizeOrThrow(R.styleable.CheckableChipView_android_padding)
+            isChecked = getBoolean(R.styleable.CheckableChipView_android_checked, false)
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -263,16 +204,20 @@ class CheckableChipView @JvmOverloads constructor(
                 outline.setRoundRect(0, 0, width, height, outlineCornerRadius ?: (height / 2f))
             }
         }
+        touchFeedbackDrawable.setBounds(0, 0, width, height)
     }
 
     @CallSuper
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        outlinePaint.apply {
+            strokeWidth = outlineWidth
+            color = outlineColor
+        }
         val iconRadius = clearDrawable.intrinsicWidth / 2f
-        val strokeWidth = outlinePaint.strokeWidth
-        val halfStroke = strokeWidth / 2f
-        val rounding = outlineCornerRadius ?: (height - strokeWidth) / 2f
+        val halfStroke = outlineWidth / 2f
+        val rounding = outlineCornerRadius ?: (height - outlineWidth) / 2f
 
         // Outline
         if (progress < 1f) {
@@ -289,7 +234,7 @@ class CheckableChipView @JvmOverloads constructor(
 
         // Draws beyond bounds and relies on clipToOutline to enforce shape
         val initialIndicatorSize = clearDrawable.intrinsicWidth.toFloat()
-        val indicatorCenterX = strokeWidth + padding + padding / 2f + initialIndicatorSize / 2f
+        val indicatorCenterX = outlineWidth + padding + padding / 2f + initialIndicatorSize / 2f
         val indicatorCenterY = height / 2f
 
         val indicatorSize = lerp(
@@ -300,7 +245,8 @@ class CheckableChipView @JvmOverloads constructor(
 
         val indicatorSizeHalf = indicatorSize / 2f
 
-        val indicatorRounding = (rounding / (height - strokeWidth)) * (indicatorSizeHalf * 2f)
+        val indicatorRounding = (rounding / (height - outlineWidth)) * (indicatorSizeHalf * 2f)
+        indicatorPaint.color = checkedColor
 
         canvas.drawRoundRect(
             indicatorCenterX - indicatorSizeHalf,
@@ -315,13 +261,16 @@ class CheckableChipView @JvmOverloads constructor(
         // Text
         val textX = lerp(
             indicatorCenterX + initialIndicatorSize / 2f + padding,
-            strokeWidth + padding + padding / 2f,
+            outlineWidth + padding + padding / 2f,
             progress
         )
 
-        textPaint.color = when {
-            checkedTextColor == 0 -> defaultTextColor
-            else -> ColorUtils.blendARGB(defaultTextColor, checkedTextColor, progress)
+        textPaint.apply {
+            textSize = this@CheckableChipView.textSize
+            color = when {
+                checkedTextColor == 0 -> defaultTextColor
+                else -> ColorUtils.blendARGB(defaultTextColor, checkedTextColor, progress)
+            }
         }
 
         canvas.withTranslation(
@@ -334,7 +283,7 @@ class CheckableChipView @JvmOverloads constructor(
         // Clear icon
         if (progress > 0f) {
             canvas.withTranslation(
-                x = width - strokeWidth - padding - iconRadius,
+                x = width - outlineWidth - padding - iconRadius,
                 y = height / 2f
             ) {
                 canvas.withScale(progress, progress) {
@@ -342,6 +291,9 @@ class CheckableChipView @JvmOverloads constructor(
                 }
             }
         }
+
+        // Touch feedback
+        touchFeedbackDrawable.draw(canvas)
     }
 
     /**
@@ -395,8 +347,48 @@ class CheckableChipView @JvmOverloads constructor(
         }
     }
 
-    private fun updateContentDescription() {
-        val desc = if (isChecked) R.string.a11y_filter_applied else R.string.a11y_filter_not_applied
-        contentDescription = resources.getString(desc, text)
+    override fun verifyDrawable(who: Drawable): Boolean {
+        return super.verifyDrawable(who) || who == touchFeedbackDrawable
+    }
+
+    override fun drawableStateChanged() {
+        super.drawableStateChanged()
+        touchFeedbackDrawable.state = drawableState
+    }
+
+    override fun jumpDrawablesToCurrentState() {
+        super.jumpDrawablesToCurrentState()
+        touchFeedbackDrawable.jumpToCurrentState()
+    }
+
+    override fun drawableHotspotChanged(x: Float, y: Float) {
+        super.drawableHotspotChanged(x, y)
+        touchFeedbackDrawable.setHotspot(x, y)
+    }
+
+    /**
+     * Observable delegate, which prevents view property from setting the same value and after that requests layout if [requestLayout] is true,
+     * or calls [postInvalidateOnAnimation] otherwise.
+     *
+     * @param default default initial value for a view property
+     * @param requestLayout defines whether this view calls [requestLayout] or [postInvalidateOnAnimation] after changing a view property
+     * @param afterChangeActions custom actions to be performed after changing a view property
+     */
+    private fun <T> viewProperty(
+        default: T,
+        requestLayout: Boolean = false,
+        afterChangeActions: ((newValue: T) -> Unit)? = null
+    ) = object : ObservableProperty<T>(default) {
+
+        override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean = newValue != oldValue
+
+        override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
+            afterChangeActions?.invoke(newValue)
+            if (requestLayout) {
+                requestLayout()
+            } else {
+                postInvalidateOnAnimation()
+            }
+        }
     }
 }
