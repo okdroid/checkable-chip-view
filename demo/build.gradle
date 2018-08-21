@@ -27,12 +27,9 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        applicationId "com.waffleware.chipview.demo"
+        applicationId "com.github.okdroid.checkablechipview.demo"
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
