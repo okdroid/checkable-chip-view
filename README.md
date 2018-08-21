@@ -42,12 +42,15 @@ The following xml attributes are supported
 | Attribute                     | Description                                                  |
 | ----------------------------- | ------------------------------------------------------------ |
 | `android:text`                | The text to display                                          |
+| `android:textColor`           | The default text color                                       |
 | `android:color`               | The color of the indicator dot as well as the background color when the widget is checked |
-| `android:checked`             | The checked state of the widget, either true or false        |
-| `app:ccv_outlineColor`        | Color of the outline                                         |
-| `app:ccv_outlineCornerRadius` | Corner radius of the outline, in dp. If not set defaults to a pill shape |
+| `android:background`          | The default background color                                 |
+| `android:checked`             | The checked state of the widget, either `true` or `false`    |
+| `app:ccv_outlineColor`        | The color of the outline                                     |
+| `app:ccv_outlineCornerRadius` | The corner radius of the outline, in dp. Defaults to a pill shape if not set |
 | `app:ccv_outlineWidth`        | The stroke width of the outline, in dp                       |
 | `app:ccv_checkedTextColor`    | The text color when the widget is checked                    |
+| `app:ccv_foreground`          | The foreground drawable to display                           |
 
 The state of the widget can be observed like this
 ```kotlin
