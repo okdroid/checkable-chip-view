@@ -28,6 +28,8 @@ dependencies {
 ```
 
 ## Usage
+
+### XML
 Include the widget into your xml layout like this
 ```xml
 <com.github.okdroid.checkablechipview.CheckableChipView
@@ -52,6 +54,7 @@ The following xml attributes are supported
 | `app:ccv_checkedTextColor`    | The text color when the widget is checked                    |
 | `app:ccv_foreground`          | The foreground drawable to display                           |
 
+### In code
 The state of the widget can be observed like this
 ```kotlin
 chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
@@ -59,11 +62,20 @@ chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
 }
 ```
 
-To switch between checked/unchecked state programatically, use the following method:
+To switch between checked/unchecked state programatically with animation, use the following method:
 ```kotlin
 chip.setCheckedAnimated(checked = true) {
     // onAnimationEnd callback
 }
+```
+
+Plus, there are following methods at your service for changing the state without animation:
+```kotlin
+if (!chip.isChecked) {
+    chip.isChecked = true
+}
+
+chip.toggle() // toggles between states
 ```
 
 ## Acknowledgements
