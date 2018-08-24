@@ -2,7 +2,7 @@
 
 # CheckableChipView
 
-[![Travis (.org)](https://img.shields.io/travis/markushi/checkable-chip-view.svg?style=for-the-badge)](https://travis-ci.org/okdroid/checkable-chip-view) [![Bintray](https://img.shields.io/bintray/v/markushi/maven/checkablechipview.svg?style=for-the-badge)](https://bintray.com/markushi/maven/checkablechipview)
+[![Build Status](https://travis-ci.org/okdroid/checkable-chip-view.svg?branch=master)](https://travis-ci.org/okdroid/checkable-chip-view) [![Bintray](https://api.bintray.com/packages/markushi/maven/checkablechipview/images/download.svg)](https://bintray.com/markushi/maven/checkablechipview/_latestVersion)
 
 A checkable widget for Android. Based on the [EventFilterView from the Google I/O 2018 app](https://github.com/google/iosched/blob/2696fc7e06826ba2db72de243f0d63f83f4a29b5/mobile/src/main/java/com/google/samples/apps/iosched/ui/schedule/filters/EventFilterView.kt). 
 
