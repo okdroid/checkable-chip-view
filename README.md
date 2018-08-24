@@ -23,7 +23,7 @@ allprojects {
 Add the dependency to your lib/app `build.gradle`  
 ```gradle
 dependencies {
-    implementation 'com.github.okdroid:checkablechipview:1.0.0'
+    implementation 'com.github.okdroid:checkablechipview:1.0.1'
 }
 ```
 
