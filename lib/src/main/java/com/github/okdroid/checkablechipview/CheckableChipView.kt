@@ -378,6 +378,7 @@ class CheckableChipView @JvmOverloads constructor(
         val savedState = state as SavedState
         super.onRestoreInstanceState(savedState.superState)
 
+        // prevent listener from being invoked while restoring the state
         val listener = onCheckedChangeListener
         onCheckedChangeListener = null
         isChecked = savedState.checked
@@ -396,17 +397,13 @@ class CheckableChipView @JvmOverloads constructor(
 
         override fun describeContents() = 0
 
-        override fun writeToParcel(dest: Parcel, flags: Int) {
-            dest.writeInt(if (checked) 1 else 0)
-        }
+        override fun writeToParcel(dest: Parcel, flags: Int) = dest.writeInt(if (checked) 1 else 0)
 
         @Suppress("unused")
         companion object {
             @JvmField
             val CREATOR = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(source: Parcel): SavedState {
-                    return SavedState(source)
-                }
+                override fun createFromParcel(source: Parcel) = SavedState(source)
 
                 override fun newArray(size: Int) = arrayOfNulls<SavedState>(size)
             }
