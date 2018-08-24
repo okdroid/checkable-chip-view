@@ -27,6 +27,8 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.annotation.CallSuper
 import android.support.v4.graphics.ColorUtils
 import android.text.Layout.Alignment.ALIGN_NORMAL
@@ -364,6 +366,48 @@ class CheckableChipView @JvmOverloads constructor(
     override fun drawableHotspotChanged(x: Float, y: Float) {
         super.drawableHotspotChanged(x, y)
         touchFeedbackDrawable.setHotspot(x, y)
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        return SavedState(super.onSaveInstanceState()).apply {
+            checked = isChecked
+        }
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val savedState = state as SavedState
+        super.onRestoreInstanceState(savedState.superState)
+
+        // prevent listener from being invoked while restoring the state
+        val listener = onCheckedChangeListener
+        onCheckedChangeListener = null
+        isChecked = savedState.checked
+        onCheckedChangeListener = listener
+    }
+
+    class SavedState : BaseSavedState {
+
+        var checked: Boolean = false
+
+        constructor(state: Parcelable) : super(state)
+
+        constructor(parcel: Parcel) : super(parcel) {
+            checked = parcel.readInt() == 1
+        }
+
+        override fun describeContents() = 0
+
+        override fun writeToParcel(dest: Parcel, flags: Int) = dest.writeInt(if (checked) 1 else 0)
+
+        @Suppress("unused")
+        companion object {
+            @JvmField
+            val CREATOR = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(source: Parcel) = SavedState(source)
+
+                override fun newArray(size: Int) = arrayOfNulls<SavedState>(size)
+            }
+        }
     }
 
     /**
