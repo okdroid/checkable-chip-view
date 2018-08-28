@@ -42,11 +42,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.getColorOrThrow
-import androidx.core.content.res.getDimensionOrThrow
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.content.res.getDrawableOrThrow
-import androidx.core.content.res.getStringOrThrow
+import androidx.core.content.res.*
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
@@ -111,6 +107,8 @@ class CheckableChipView @JvmOverloads constructor(
      * Sets the listener to be called when the checked state changes.
      */
     var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
+
+    private var targetProgress: Float = 0f
 
     private var progress: Float by viewProperty(0f) {
         if (it == 0f || it == 1f) {
@@ -302,18 +300,18 @@ class CheckableChipView @JvmOverloads constructor(
      * Starts the animation to enable/disable a filter and invokes a function when done.
      */
     fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
-        val newProgress = if (checked) 1f else 0f
-        if (newProgress != progress) {
+        targetProgress = if (checked) 1f else 0f
+        if (targetProgress != progress) {
             progressAnimator.apply {
                 removeAllListeners()
                 cancel()
-                setFloatValues(progress, newProgress)
+                setFloatValues(progress, targetProgress)
                 duration = if (checked) CHECKING_DURATION else UNCHECKING_DURATION
                 addUpdateListener {
                     progress = it.animatedValue as Float
                 }
                 doOnEnd {
-                    progress = newProgress
+                    progress = targetProgress
                     onEnd?.invoke()
                 }
                 start()
@@ -330,14 +328,15 @@ class CheckableChipView @JvmOverloads constructor(
         return handled
     }
 
-    override fun isChecked() = progress == 1f
+    override fun isChecked() = targetProgress == 1f
 
     override fun toggle() {
         isChecked = !isChecked
     }
 
     override fun setChecked(checked: Boolean) {
-        progress = if (checked) 1f else 0f
+        targetProgress = if (checked) 1f else 0f
+        progress = targetProgress
     }
 
     private fun createLayout(textWidth: Int) {
@@ -387,6 +386,15 @@ class CheckableChipView @JvmOverloads constructor(
 
     class SavedState : BaseSavedState {
 
+        @Suppress("unused")
+        companion object {
+            @JvmField
+            val CREATOR = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
+                override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+            }
+        }
+
         var checked: Boolean = false
 
         constructor(state: Parcelable) : super(state)
@@ -395,19 +403,12 @@ class CheckableChipView @JvmOverloads constructor(
             checked = parcel.readInt() == 1
         }
 
-        override fun describeContents() = 0
-
-        override fun writeToParcel(dest: Parcel, flags: Int) = dest.writeInt(if (checked) 1 else 0)
-
-        @Suppress("unused")
-        companion object {
-            @JvmField
-            val CREATOR = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(source: Parcel) = SavedState(source)
-
-                override fun newArray(size: Int) = arrayOfNulls<SavedState>(size)
-            }
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            super.writeToParcel(dest, flags)
+            dest.writeInt(if (checked) 1 else 0)
         }
+
+        override fun describeContents() = 0
     }
 
     /**
