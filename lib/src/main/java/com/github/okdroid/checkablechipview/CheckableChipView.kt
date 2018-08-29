@@ -303,7 +303,7 @@ class CheckableChipView @JvmOverloads constructor(
     /**
      * Starts the animation to enable/disable a filter and invokes a function when done.
      */
-    fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
+    fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)? = null) {
         targetProgress = if (checked) 1f else 0f
         if (targetProgress != progress) {
             progressAnimator.apply {
