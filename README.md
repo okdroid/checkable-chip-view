@@ -65,7 +65,7 @@ chip.setOnCheckedChangeListener { view, isChecked ->
 To switch between checked/unchecked state programatically with animation, use the following method:
 ```kotlin
 chip.setCheckedAnimated(checked = true) {
-    // onAnimationEnd callback
+    // onAnimationEnd callback (optional)
 }
 ```
 
