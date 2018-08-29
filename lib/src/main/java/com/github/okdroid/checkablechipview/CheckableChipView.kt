@@ -49,6 +49,8 @@ import androidx.core.graphics.withTranslation
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
+typealias OnCheckedChangeListener = (view: CheckableChipView, checked: Boolean) -> Unit
+
 /**
  * A custom view for displaying filters. Allows a custom presentation of the tag color and selection
  * state.
@@ -122,7 +124,7 @@ class CheckableChipView @JvmOverloads constructor(
 
     private lateinit var textLayout: StaticLayout
 
-    private var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
+    private var onCheckedChangeListener: OnCheckedChangeListener? = null
 
     private val progressAnimator: ValueAnimator by lazy {
         ValueAnimator.ofFloat().apply {
@@ -294,7 +296,7 @@ class CheckableChipView @JvmOverloads constructor(
         touchFeedbackDrawable.draw(canvas)
     }
 
-    fun setOnCheckedChangeListener(onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)?) {
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener?) {
         this.onCheckedChangeListener = onCheckedChangeListener
     }
 
