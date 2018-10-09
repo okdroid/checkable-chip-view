@@ -152,7 +152,7 @@ class CheckableChipView @JvmOverloads constructor(
             checkedTextColor = getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, Color.TRANSPARENT)
             defaultTextColor = getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
 
-            text = getStringOrThrow(R.styleable.CheckableChipView_android_text)
+            getString(R.styleable.CheckableChipView_android_text)?.let { text = it }
             textSize = getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
 
             clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon).apply {
