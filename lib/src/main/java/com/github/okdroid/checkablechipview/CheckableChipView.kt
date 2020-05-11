@@ -29,8 +29,6 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.annotation.CallSuper
-import android.support.v4.graphics.ColorUtils
 import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -41,9 +39,14 @@ import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
 import android.widget.Checkable
 import android.widget.TextView
+import androidx.annotation.CallSuper
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.*
+import androidx.core.content.res.getColorOrThrow
+import androidx.core.content.res.getDimensionOrThrow
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
+import androidx.core.content.res.getDrawableOrThrow
 import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import kotlin.properties.ObservableProperty
@@ -368,7 +371,7 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     override fun onSaveInstanceState(): Parcelable {
-        return SavedState(super.onSaveInstanceState()).apply {
+        return SavedState(super.onSaveInstanceState()!!).apply {
             checked = isChecked
         }
     }

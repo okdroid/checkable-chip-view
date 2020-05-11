@@ -20,7 +20,7 @@ apply plugin: 'maven-publish'
 
 def artifactGroup = 'com.github.okdroid'
 def artifactName = 'checkablechipview'
-def artifactVersion = '1.0.3'
+def artifactVersion = '2.0.0'
 
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
