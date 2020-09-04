@@ -57,7 +57,7 @@ The following xml attributes are supported
 ### In code
 The state of the widget can be observed like this
 ```kotlin
-chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
+chip.setOnCheckedChangeListener { view, isChecked ->
     // do your logic here
 }
 ```
@@ -65,7 +65,7 @@ chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
 To switch between checked/unchecked state programatically with animation, use the following method:
 ```kotlin
 chip.setCheckedAnimated(checked = true) {
-    // onAnimationEnd callback
+    // onAnimationEnd callback (optional)
 }
 ```
 

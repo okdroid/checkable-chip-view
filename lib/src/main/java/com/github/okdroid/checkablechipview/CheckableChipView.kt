@@ -52,6 +52,8 @@ import androidx.core.graphics.withTranslation
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
+typealias OnCheckedChangeListener = (view: CheckableChipView, checked: Boolean) -> Unit
+
 /**
  * A custom view for displaying filters. Allows a custom presentation of the tag color and selection
  * state.
@@ -106,10 +108,6 @@ class CheckableChipView @JvmOverloads constructor(
      */
     var outlineCornerRadius: Float? by viewProperty(null)
 
-    /**
-     * Sets the listener to be called when the checked state changes.
-     */
-    var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
     private var targetProgress: Float = 0f
 
@@ -128,6 +126,8 @@ class CheckableChipView @JvmOverloads constructor(
     private lateinit var touchFeedbackDrawable: Drawable
 
     private lateinit var textLayout: StaticLayout
+
+    private var onCheckedChangeListener: OnCheckedChangeListener? = null
 
     private val progressAnimator: ValueAnimator by lazy {
         ValueAnimator.ofFloat().apply {
@@ -299,10 +299,14 @@ class CheckableChipView @JvmOverloads constructor(
         touchFeedbackDrawable.draw(canvas)
     }
 
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener?) {
+        this.onCheckedChangeListener = onCheckedChangeListener
+    }
+
     /**
      * Starts the animation to enable/disable a filter and invokes a function when done.
      */
-    fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
+    fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)? = null) {
         targetProgress = if (checked) 1f else 0f
         if (targetProgress != progress) {
             progressAnimator.apply {

@@ -32,7 +32,7 @@ class MainActivity : Activity() {
         val chips = listOf<CheckableChipView>(chip0, chip1, chip2)
 
         chips.forEach { chip ->
-            chip.onCheckedChangeListener = { view: CheckableChipView, isChecked: Boolean ->
+            chip.setOnCheckedChangeListener { view, isChecked ->
                 Toast
                     .makeText(this@MainActivity, "${view.text} checked: $isChecked", Toast.LENGTH_SHORT)
                     .show()
