@@ -20,10 +20,7 @@ package com.github.okdroid.checkablechipview
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Outline
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
@@ -33,6 +30,7 @@ import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewOutlineProvider
@@ -51,6 +49,7 @@ import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
+
 
 /**
  * A custom view for displaying filters. Allows a custom presentation of the tag color and selection
@@ -111,6 +110,12 @@ class CheckableChipView @JvmOverloads constructor(
      */
     var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
+    /**
+     * Set typeface
+     */
+    var font:String? by viewProperty("")
+
+
     private var targetProgress: Float = 0f
 
     private var progress: Float by viewProperty(0f) {
@@ -150,7 +155,9 @@ class CheckableChipView @JvmOverloads constructor(
             if (hasValue(R.styleable.CheckableChipView_ccv_outlineCornerRadius)) {
                 outlineCornerRadius = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineCornerRadius)
             }
-
+            if (hasValue(R.styleable.CheckableChipView_ccv_fontFamily)){
+                font  = getString(R.styleable.CheckableChipView_ccv_fontFamily)
+            }
             checkedColor = getColor(R.styleable.CheckableChipView_android_color, checkedColor)
             checkedTextColor = getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, Color.TRANSPARENT)
             defaultTextColor = getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
@@ -268,6 +275,9 @@ class CheckableChipView @JvmOverloads constructor(
             progress
         )
 
+        // setTypeface
+        setTypeface(context, font)
+
         textPaint.apply {
             textSize = this@CheckableChipView.textSize
             color = when {
@@ -349,6 +359,18 @@ class CheckableChipView @JvmOverloads constructor(
             @Suppress("DEPRECATION")
             StaticLayout(text, textPaint, textWidth, ALIGN_NORMAL, 1f, 0f, true)
         }
+    }
+
+    private fun setTypeface(ctx: Context, asset: String?): Boolean {
+        val tf: Typeface
+        tf = try {
+            Typeface.createFromAsset(ctx.assets, asset)
+        } catch (e: Exception) {
+            Log.e(context.packageName, "Could not get typeface: ${e.message}Place your fonts in assets folder to access ccv_fontFamily attribute.".trimIndent())
+            return false
+        }
+        textPaint.typeface = tf
+        return true
     }
 
     override fun verifyDrawable(who: Drawable): Boolean {
