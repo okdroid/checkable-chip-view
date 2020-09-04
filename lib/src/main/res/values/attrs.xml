@@ -35,6 +35,8 @@
 
         <attr name="ccv_foreground" format="reference"/>
         <attr name="ccv_clearIcon" format="reference"/>
+
+        <attr name="ccv_fontFamily" format="string"/>
     </declare-styleable>
 
     <style name="Widget.CheckableChipView" parent="">

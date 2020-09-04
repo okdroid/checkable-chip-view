@@ -1,39 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        tools:context=".MainActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <com.github.okdroid.checkablechipview.CheckableChipView
-            android:id="@+id/chip0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sample 0"/>
+        android:id="@+id/chip0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sample 0" />
 
     <com.github.okdroid.checkablechipview.CheckableChipView
-            android:color="#FFC107"
-            android:id="@+id/chip1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Sample 1"
-            app:ccv_outlineColor="#FFC107"/>
+        android:id="@+id/chip1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:color="#FFC107"
+        android:text="Sample 1"
+        app:ccv_outlineColor="#FFC107" />
 
     <com.github.okdroid.checkablechipview.CheckableChipView
-            android:id="@+id/chip2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Sample 2"
-            android:color="@color/colorAccent"
-            app:ccv_outlineColor="@color/colorAccent"
-            app:ccv_outlineCornerRadius="6dp"
-            app:ccv_checkedTextColor="?android:textColorPrimaryInverse"
-            app:ccv_outlineWidth="2dp"/>
+        android:id="@+id/chip2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:color="@color/colorAccent"
+        android:text="Sample 2"
+        app:ccv_checkedTextColor="?android:textColorPrimaryInverse"
+        app:ccv_outlineColor="@color/colorAccent"
+        app:ccv_outlineCornerRadius="6dp"
+        app:ccv_outlineWidth="2dp" />
 
 </LinearLayout>
